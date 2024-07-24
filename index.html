@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cool Pomodoro Timer</title>
+    <link rel="stylesheet" href="popup.css">
+</head>
+<body>
+    <div class="container">
+        <div class="timer-circle">
+            <svg width="200" height="200">
+                <circle class="timer-background" cx="100" cy="100" r="90"></circle>
+                <circle class="timer-progress" cx="100" cy="100" r="90"></circle>
+            </svg>
+            <div class="timer-display">25:00</div>
+        </div>
+        <div class="controls">
+            <button id="startBtn">Start</button>
+            <button id="pauseBtn" disabled>Pause</button>
+            <button id="resetBtn">Reset</button>
+        </div>
+        <div class="session-info">
+            <span id="sessionCount">Session: 1</span>
+            <span id="cycleType">Work</span>
+        </div>
+        <div class="quote" id="quoteDisplay"></div>
+    </div>
+    <script src="popup.js"></script>
+</body>
+</html>
