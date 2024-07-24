@@ -1,20 +1,49 @@
+:root {
+    --primary-color: #4CAF50;
+    --secondary-color: #FFA726;
+    --tertiary-color: #FF7043;
+    --background-color: #FFFFFF;
+    --text-color: #333333;
+    --shadow-color: rgba(0, 0, 0, 0.1);
+}
+
 body {
-    width: 300px;
-    font-family: Arial, sans-serif;
-    background-color: #f0f0f0;
+    width: 350px;
+    font-family: 'Roboto', sans-serif;
+    background-color: var(--background-color);
+    color: var(--text-color);
     margin: 0;
     padding: 20px;
+    transition: all 0.3s ease;
 }
 
 .container {
     text-align: center;
 }
 
+header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+h1 {
+    font-size: 24px;
+    margin: 0;
+}
+
+.timer-container {
+    position: relative;
+    width: 250px;
+    height: 250px;
+    margin: 0 auto 20px;
+}
+
 .timer-circle {
     position: relative;
-    width: 200px;
-    height: 200px;
-    margin: 0 auto 20px;
+    width: 100%;
+    height: 100%;
 }
 
 .timer-background, .timer-progress {
@@ -27,28 +56,36 @@ body {
 }
 
 .timer-progress {
-    stroke: #4CAF50;
+    stroke: var(--primary-color);
     stroke-linecap: round;
     transform: rotate(-90deg);
     transform-origin: 50% 50%;
     transition: stroke-dashoffset 0.3s;
 }
 
-.timer-display {
+.timer-content {
     position: absolute;
     top: 50%;
     left: 50%;
     transform: translate(-50%, -50%);
-    font-size: 32px;
+    text-align: center;
+}
+
+.timer-display {
+    font-size: 48px;
     font-weight: bold;
+}
+
+.cycle-type {
+    font-size: 18px;
+    margin-top: 10px;
 }
 
 .controls {
     margin-bottom: 20px;
 }
 
-button {
-    background-color: #4CAF50;
+.btn {
     border: none;
     color: white;
     padding: 10px 20px;
@@ -58,20 +95,41 @@ button {
     font-size: 16px;
     margin: 4px 2px;
     cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.3s;
+    border-radius: 25px;
+    transition: background-color 0.3s, transform 0.1s;
 }
 
-button:hover {
-    background-color: #45a049;
+.btn:hover {
+    transform: scale(1.05);
 }
 
-button:disabled {
+.btn-primary {
+    background-color: var(--primary-color);
+}
+
+.btn-secondary {
+    background-color: var(--secondary-color);
+}
+
+.btn-tertiary {
+    background-color: var(--tertiary-color);
+}
+
+.btn:disabled {
     background-color: #cccccc;
     cursor: not-allowed;
 }
 
+.info-panel {
+    background-color: #f5f5f5;
+    border-radius: 10px;
+    padding: 15px;
+    margin-bottom: 20px;
+}
+
 .session-info {
+    display: flex;
+    justify-content: space-between;
     margin-bottom: 10px;
     font-size: 14px;
 }
@@ -80,5 +138,95 @@ button:disabled {
     font-style: italic;
     font-size: 14px;
     color: #666;
-    margin-top: 20px;
+}
+
+.settings {
+    text-align: right;
+}
+
+.btn-icon {
+    background: none;
+    border: none;
+    font-size: 24px;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.modal {
+    display: none;
+    position: fixed;
+    z-index: 1;
+    left: 0;
+    top: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0,0,0,0.4);
+}
+
+.modal-content {
+    background-color: var(--background-color);
+    margin: 15% auto;
+    padding: 20px;
+    border: 1px solid #888;
+    width: 80%;
+    border-radius: 10px;
+}
+
+.modal-content h2 {
+    margin-top: 0;
+}
+
+.modal-content label {
+    display: block;
+    margin-top: 10px;
+}
+
+.modal-content input {
+    width: 100%;
+    padding: 5px;
+    margin-top: 5px;
+}
+
+.theme-switch__input {
+    display: none;
+}
+
+.theme-switch__label {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    background-color: #ccc;
+    border-radius: 34px;
+    transition: background-color .3s;
+}
+
+.theme-switch__label:before {
+    content: '';
+    position: absolute;
+    width: 26px;
+    height: 26px;
+    border-radius: 50%;
+    top: 4px;
+    left: 4px;
+    background-color: white;
+    transition: .3s;
+}
+
+.theme-switch__input:checked + .theme-switch__label {
+    background-color: var(--primary-color);
+}
+
+.theme-switch__input:checked + .theme-switch__label:before {
+    transform: translateX(26px);
+}
+
+/* Dark theme */
+body.dark-theme {
+    --primary-color: #66BB6A;
+    --secondary-color: #FFB74D;
+    --tertiary-color: #FF8A65;
+    --background-color: #333333;
+    --text-color: #FFFFFF;
+    --shadow-color: rgba(255, 255, 255, 0.1);
 }
