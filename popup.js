@@ -1,36 +1,56 @@
+// DOM elements
 const timerDisplay = document.querySelector('.timer-display');
 const timerProgress = document.querySelector('.timer-progress');
 const startBtn = document.getElementById('startBtn');
 const pauseBtn = document.getElementById('pauseBtn');
 const resetBtn = document.getElementById('resetBtn');
 const sessionCount = document.getElementById('sessionCount');
-const cycleType = document.getElementById('cycleType');
+const totalTimeDisplay = document.getElementById('totalTime');
+const cycleType = document.querySelector('.cycle-type');
 const quoteDisplay = document.getElementById('quoteDisplay');
+const themeSwitch = document.getElementById('themeSwitch');
+const settingsBtn = document.getElementById('settingsBtn');
+const settingsModal = document.getElementById('settingsModal');
+const closeSettingsBtn = document.getElementById('closeSettings');
+const saveSettingsBtn = document.getElementById('saveSettings');
 
+// Timer variables
 let timer;
-let timeLeft = 25 * 60;
+let timeLeft;
 let isRunning = false;
 let isWorkCycle = true;
 let currentSession = 1;
+let totalSeconds = 0;
 
-const workDuration = 25 * 60;
-const shortBreakDuration = 5 * 60;
-const longBreakDuration = 15 * 60;
+// Customizable durations (in seconds)
+let workDuration = 25 * 60;
+let shortBreakDuration = 5 * 60;
+let longBreakDuration = 15 * 60;
 
+// Initialize timer display
+function initializeTimer() {
+    timeLeft = workDuration;
+    updateTimerDisplay();
+    updateTotalTime();
+}
+
+// Update timer display and progress
 function updateTimerDisplay() {
     const minutes = Math.floor(timeLeft / 60);
     const seconds = timeLeft % 60;
     timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     
-    const progress = isWorkCycle ? 
-        (workDuration - timeLeft) / workDuration : 
-        ((isWorkCycle ? shortBreakDuration : longBreakDuration) - timeLeft) / (isWorkCycle ? shortBreakDuration : longBreakDuration);
+    const totalDuration = isWorkCycle ? workDuration : (currentSession % 4 === 0 ? longBreakDuration : shortBreakDuration);
+    const progress = (totalDuration - timeLeft) / totalDuration;
     
-    const circumference = 2 * Math.PI * 90;
+    const circumference = 2 * Math.PI * 120;
     timerProgress.style.strokeDasharray = `${circumference} ${circumference}`;
     timerProgress.style.strokeDashoffset = circumference * (1 - progress);
+
+    cycleType.textContent = isWorkCycle ? 'Work Time' : (currentSession % 4 === 0 ? 'Long Break' : 'Short Break');
 }
 
+// Start the timer
 function startTimer() {
     if (!isRunning) {
         isRunning = true;
@@ -39,7 +59,9 @@ function startTimer() {
         
         timer = setInterval(() => {
             timeLeft--;
+            totalSeconds++;
             updateTimerDisplay();
+            updateTotalTime();
             
             if (timeLeft === 0) {
                 clearInterval(timer);
@@ -52,14 +74,11 @@ function startTimer() {
                     sessionCount.textContent = `Session: ${currentSession}`;
                     
                     if (currentSession % 4 === 0) {
-                        cycleType.textContent = 'Long Break';
                         timeLeft = longBreakDuration;
                     } else {
-                        cycleType.textContent = 'Short Break';
                         timeLeft = shortBreakDuration;
                     }
                 } else {
-                    cycleType.textContent = 'Work';
                     timeLeft = workDuration;
                 }
                 
@@ -72,6 +91,7 @@ function startTimer() {
     }
 }
 
+// Pause the timer
 function pauseTimer() {
     clearInterval(timer);
     isRunning = false;
@@ -79,29 +99,33 @@ function pauseTimer() {
     pauseBtn.disabled = true;
 }
 
+// Reset the timer
 function resetTimer() {
     clearInterval(timer);
     isRunning = false;
     isWorkCycle = true;
     currentSession = 1;
+    totalSeconds = 0;
     timeLeft = workDuration;
-    cycleType.textContent = 'Work';
     sessionCount.textContent = 'Session: 1';
     startBtn.disabled = false;
     pauseBtn.disabled = true;
     updateTimerDisplay();
+    updateTotalTime();
     displayRandomQuote();
 }
 
+// Show browser notification
 function showNotification() {
-    chrome.notifications.create({
-        type: 'basic',
-        iconUrl: 'icon.png',
-        title: 'Pomodoro Timer',
-        message: isWorkCycle ? 'Time for a break!' : 'Time to work!',
-    });
+    if (Notification.permission === "granted") {
+        new Notification("Pomodoro Timer", {
+            icon: 'icon.png',
+            body: isWorkCycle ? 'Time for a break!' : 'Time to work!',
+        });
+    }
 }
 
+// Display a random motivational quote
 function displayRandomQuote() {
     const quotes = [
         "The secret of getting ahead is getting started.",
@@ -115,9 +139,55 @@ function displayRandomQuote() {
     quoteDisplay.textContent = randomQuote;
 }
 
+// Update total time display
+function updateTotalTime() {
+    const hours = Math.floor(totalSeconds / 3600);
+    const minutes = Math.floor((totalSeconds % 3600) / 60);
+    totalTimeDisplay.textContent = `Total: ${hours.toString().padStart(2, '0')}:${minutes.toString().padStart(2, '0')}`;
+}
+
+// Toggle dark/light theme
+function toggleTheme() {
+    document.body.classList.toggle('dark-theme');
+}
+
+// Open settings modal
+function openSettings() {
+    settingsModal.style.display = 'block';
+    document.getElementById('workDuration').value = workDuration / 60;
+    document.getElementById('shortBreakDuration').value = shortBreakDuration / 60;
+    document.getElementById('longBreakDuration').value = longBreakDuration / 60;
+}
+
+// Close settings modal
+function closeSettings() {
+    settingsModal.style.display = 'none';
+}
+
+// Save settings
+function saveSettings() {
+    workDuration = parseInt(document.getElementById('workDuration').value) * 60;
+    shortBreakDuration = parseInt(document.getElementById('shortBreakDuration').value) * 60;
+    longBreakDuration = parseInt(document.getElementById('longBreakDuration').value) * 60;
+    
+    resetTimer();
+    closeSettings();
+}
+
+// Event listeners
 startBtn.addEventListener('click', startTimer);
 pauseBtn.addEventListener('click', pauseTimer);
 resetBtn.addEventListener('click', resetTimer);
+themeSwitch.addEventListener('change', toggleTheme);
+settingsBtn.addEventListener('click', openSettings);
+closeSettingsBtn.addEventListener('click', closeSettings);
+saveSettingsBtn.addEventListener('click', saveSettings);
 
-updateTimerDisplay();
+// Initialize the extension
+initializeTimer();
 displayRandomQuote();
+
+// Request notification permission
+if (Notification.permission !== "granted") {
+    Notification.requestPermission();
+}
