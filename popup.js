@@ -9,10 +9,39 @@ const totalTimeDisplay = document.getElementById('totalTime');
 const cycleType = document.querySelector('.cycle-type');
 const quoteDisplay = document.getElementById('quoteDisplay');
 const themeSwitch = document.getElementById('themeSwitch');
-const settingsBtn = document.getElementById('settingsBtn');
 const settingsModal = document.getElementById('settingsModal');
 const closeSettingsBtn = document.getElementById('closeSettings');
 const saveSettingsBtn = document.getElementById('saveSettings');
+
+const settingsBtn = document.getElementById('settingsBtn');
+settingsBtn.addEventListener('mouseover', () => {
+    settingsBtn.querySelector('i').style.animation = 'fa-spin 2s linear infinite';
+});
+settingsBtn.addEventListener('mouseout', () => {
+    settingsBtn.querySelector('i').style.animation = 'none';
+});
+
+document.querySelectorAll('.btn').forEach(button => {
+    button.addEventListener('click', function(e) {
+        let ripple = document.createElement('span');
+        ripple.classList.add('ripple');
+        this.appendChild(ripple);
+        let x = e.clientX - e.target.offsetLeft;
+        let y = e.clientY - e.target.offsetTop;
+        ripple.style.left = `${x}px`;
+        ripple.style.top = `${y}px`;
+        setTimeout(() => {
+            ripple.remove();
+        }, 300);
+    });
+});
+
+document.querySelectorAll('input[type="range"]').forEach(input => {
+    const output = document.querySelector(`output[for="${input.id}"]`);
+    input.addEventListener('input', () => {
+        output.textContent = input.value;
+    });
+});
 
 // Timer variables
 let timer;
@@ -41,13 +70,18 @@ function updateTimerDisplay() {
     timerDisplay.textContent = `${minutes.toString().padStart(2, '0')}:${seconds.toString().padStart(2, '0')}`;
     
     const totalDuration = isWorkCycle ? workDuration : (currentSession % 4 === 0 ? longBreakDuration : shortBreakDuration);
-    const progress = (totalDuration - timeLeft) / totalDuration;
     
     const circumference = 2 * Math.PI * 120;
     timerProgress.style.strokeDasharray = `${circumference} ${circumference}`;
     timerProgress.style.strokeDashoffset = circumference * (1 - progress);
 
     cycleType.textContent = isWorkCycle ? 'Work Time' : (currentSession % 4 === 0 ? 'Long Break' : 'Short Break');
+
+    const progress = isWorkCycle ? 
+        (workDuration - timeLeft) / workDuration : 
+        ((isWorkCycle ? shortBreakDuration : longBreakDuration) - timeLeft) / (isWorkCycle ? shortBreakDuration : longBreakDuration);
+    
+    animateProgress(progress);
 }
 
 // Start the timer
@@ -172,6 +206,13 @@ function saveSettings() {
     
     resetTimer();
     closeSettings();
+}
+
+function animateProgress(progress) {
+    const circumference = 2 * Math.PI * 140;
+    const offset = circumference - (progress * circumference);
+    timerProgress.style.strokeDasharray = `${circumference} ${circumference}`;
+    timerProgress.style.strokeDashoffset = offset;
 }
 
 // Event listeners
